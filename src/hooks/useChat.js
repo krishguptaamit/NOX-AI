@@ -34,16 +34,24 @@ export default function useChat() {
       text,
     };
 
-    setConversations((prev) =>
-      prev.map((chat) =>
-        chat.id === currentChatId
-          ? {
-              ...chat,
-              messages: [...chat.messages, userMessage],
-            }
-          : chat
-      )
-    );
+   setConversations((prev) =>
+  prev.map((chat) => {
+    if (chat.id !== currentChatId) return chat;
+
+    const shouldUpdateTitle =
+      chat.title === "New Chat";
+
+    return {
+      ...chat,
+      title: shouldUpdateTitle
+        ? text.length > 30
+          ? text.substring(0, 30) + "..."
+          : text
+        : chat.title,
+      messages: [...chat.messages, userMessage],
+    };
+  })
+);
 
     setIsTyping(true);
 
