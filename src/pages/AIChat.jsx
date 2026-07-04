@@ -9,7 +9,15 @@ import useChat from "../hooks/useChat";
 
 export default function AIChat() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { messages, sendMessage } = useChat();
+const {
+  conversations,
+  currentChatId,
+  setCurrentChatId,
+  messages,
+  sendMessage,
+  createNewChat,
+  isTyping,
+} = useChat();
 
   return (
     <div className="relative h-[calc(100vh-96px)]">
@@ -45,9 +53,13 @@ export default function AIChat() {
           }
         `}
         >
-          <ChatSidebar
-            setSidebarOpen={setSidebarOpen}
-          />
+         <ChatSidebar
+  setSidebarOpen={setSidebarOpen}
+  conversations={conversations}
+  currentChatId={currentChatId}
+  setCurrentChatId={setCurrentChatId}
+  createNewChat={createNewChat}
+/>
         </aside>
 
         {/* Chat */}
@@ -73,8 +85,9 @@ export default function AIChat() {
 
           <div className="flex-1 overflow-y-auto">
 
-            <ChatMessages
+       <ChatMessages
   messages={messages}
+  isTyping={isTyping}
 />
 
           </div>

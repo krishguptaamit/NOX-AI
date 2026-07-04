@@ -5,33 +5,12 @@ import {
   X,
 } from "lucide-react";
 
-const sections = [
-  {
-    title: "Today",
-    chats: [
-      "Build Dashboard",
-      "React Portfolio",
-      "AI Landing Page",
-    ],
-  },
-  {
-    title: "Yesterday",
-    chats: [
-      "Weather App",
-      "Resume Builder",
-    ],
-  },
-  {
-    title: "Last 7 Days",
-    chats: [
-      "NOX AI",
-      "Ecommerce UI",
-    ],
-  },
-];
-
 export default function ChatSidebar({
   setSidebarOpen,
+  conversations,
+  currentChatId,
+  setCurrentChatId,
+  createNewChat,
 }) {
   return (
     <div
@@ -58,8 +37,8 @@ export default function ChatSidebar({
 
         </h2>
 
-        <button
-          onClick={() => setSidebarOpen(false)}
+          <button
+   onClick={() => setSidebarOpen(false)}
           className="
           w-10
           h-10
@@ -79,7 +58,10 @@ export default function ChatSidebar({
       {/* Button */}
 
       <button
-        onClick={() => setSidebarOpen(false)}
+       onClick={() => {
+    createNewChat();
+    setSidebarOpen(false);
+  }}
         className="
         w-full
         py-4
@@ -113,60 +95,56 @@ export default function ChatSidebar({
         space-y-8
       "
       >
+      <div>
 
-        {sections.map((section) => (
+  <h3 className="text-xs uppercase tracking-[2px] text-gray-500 mb-4">
+    Chats
+  </h3>
 
-          <div key={section.title}>
+  <div className="space-y-2">
 
-            <h3
-              className="
-              text-xs
-              uppercase
-              tracking-[2px]
-              text-gray-500
-              mb-4
-            "
-            >
-              {section.title}
-            </h3>
+    {conversations.map((chat) => (
 
-            <div className="space-y-2">
+      <button
+        key={chat.id}
+        onClick={() => {
+          setCurrentChatId(chat.id);
+          setSidebarOpen(false);
+        }}
+        className={`
+          w-full
+          flex
+          items-center
+          gap-3
+          px-3
+          py-3
+          rounded-xl
+          text-left
+          transition
 
-              {section.chats.map((chat) => (
+          ${
+            currentChatId === chat.id
+              ? "bg-violet-600 text-white"
+              : "hover:bg-violet-500/10"
+          }
+        `}
+      >
 
-                <button
-                  key={chat}
-                  onClick={() => setSidebarOpen(false)}
-                  className="
-                  w-full
-                  flex
-                  items-center
-                  gap-3
-                  px-3
-                  py-3
-                  rounded-xl
-                  text-left
-                  hover:bg-violet-500/10
-                  transition
-                "
-                >
-                  <MessageSquare size={17} />
+        <MessageSquare size={17} />
 
-                  <span className="truncate">
+        <span className="truncate">
 
-                    {chat}
+          {chat.title}
 
-                  </span>
+        </span>
 
-                </button>
+      </button>
 
-              ))}
+    ))}
 
-            </div>
+  </div>
 
-          </div>
-
-        ))}
+</div>                 
 
       </div>
 
