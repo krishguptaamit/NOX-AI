@@ -1,7 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function useChat() {
-  const [conversations, setConversations] = useState([
+ const [conversations, setConversations] = useState(() => {
+
+  const saved = localStorage.getItem("nox-conversations");
+
+  if (saved) {
+    return JSON.parse(saved);
+  }
+
+  return [
     {
       id: 1,
       title: "New Chat",
@@ -13,9 +21,17 @@ export default function useChat() {
         },
       ],
     },
-  ]);
+  ];
 
-  const [currentChatId, setCurrentChatId] = useState(1);
+});
+
+const [currentChatId, setCurrentChatId] = useState(() => {
+
+  const saved = localStorage.getItem("nox-current-chat");
+
+  return saved ? Number(saved) : 1;
+
+});
 
   const [isTyping, setIsTyping] = useState(false);
 
@@ -96,6 +112,24 @@ This is a temporary NOX AI response.`,
 
     setCurrentChatId(newChat.id);
   };
+
+  useEffect(() => {
+
+  localStorage.setItem(
+    "nox-conversations",
+    JSON.stringify(conversations)
+  );
+
+}, [conversations]);
+
+useEffect(() => {
+
+  localStorage.setItem(
+    "nox-current-chat",
+    currentChatId
+  );
+
+}, [currentChatId]);
 
   return {
     conversations,
