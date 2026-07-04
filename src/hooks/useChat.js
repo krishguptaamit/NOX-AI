@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { askAI } from "../services/aiService";
+import { typeWriter } from "../utils/typeWriter";
 
 export default function useChat() {
  const [conversations, setConversations] = useState(() => {
@@ -42,7 +44,7 @@ const [currentChatId, setCurrentChatId] = useState(() => {
 
   const messages = currentConversation?.messages || [];
 
-  const sendMessage = (text) => {
+  const sendMessage = async (text) => {
     if (!text.trim()) return;
 
     const userMessage = {
@@ -50,13 +52,11 @@ const [currentChatId, setCurrentChatId] = useState(() => {
       sender: "user",
       text,
     };
-
-   setConversations((prev) =>
+    setConversations((prev) =>
   prev.map((chat) => {
     if (chat.id !== currentChatId) return chat;
 
-    const shouldUpdateTitle =
-      chat.title === "New Chat";
+    const shouldUpdateTitle = chat.title === "New Chat";
 
     return {
       ...chat,
@@ -70,30 +70,89 @@ const [currentChatId, setCurrentChatId] = useState(() => {
   })
 );
 
-    setIsTyping(true);
+   setIsTyping(true);
 
-    setTimeout(() => {
-      const aiMessage = {
-        id: Date.now() + 1,
-        sender: "ai",
-        text: `You said: "${text}"
+try {
+  const result = await askAI([
+    {
+      role: "user",
+      content: text,
+    },
+  ]);
 
-This is a temporary NOX AI response.`,
-      };
+ const aiId = Date.now() + 1;
 
-      setConversations((prev) =>
-        prev.map((chat) =>
-          chat.id === currentChatId
-            ? {
-                ...chat,
-                messages: [...chat.messages, aiMessage],
-              }
-            : chat
-        )
-      );
+setConversations((prev) =>
+  prev.map((chat) =>
+    chat.id === currentChatId
+      ? {
+          ...chat,
+          messages: [
+            ...chat.messages,
+            {
+              id: aiId,
+              sender: "ai",
+              text: "",
+            },
+          ],
+        }
+      : chat
+  )
+);
 
-      setIsTyping(false);
-    }, 1500);
+await typeWriter(result.content, (currentText) => {
+  setConversations((prev) =>
+    prev.map((chat) =>
+      chat.id === currentChatId
+        ? {
+            ...chat,
+            messages: chat.messages.map((msg) =>
+              msg.id === aiId
+                ? {
+                    ...msg,
+                    text: currentText,
+                  }
+                : msg
+            ),
+          }
+        : chat
+    )
+  );
+});
+
+  // setConversations((prev) =>
+  //   prev.map((chat) =>
+  //     chat.id === currentChatId
+  //       ? {
+  //           ...chat,
+  //           messages: [...chat.messages, aiMessage],
+  //         }
+  //       : chat
+  //   )
+  // );
+} catch (error) {
+  console.error(error);
+
+  const aiMessage = {
+    id: Date.now() + 1,
+    sender: "ai",
+    text: "❌ Failed to connect to NOX AI.",
+  };
+
+  setConversations((prev) =>
+    prev.map((chat) =>
+      chat.id === currentChatId
+        ? {
+            ...chat,
+            messages: [...chat.messages, aiMessage],
+          }
+        : chat
+    )
+  );
+}
+
+setIsTyping(false);
+    
   };
 
   const createNewChat = () => {
