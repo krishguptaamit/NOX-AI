@@ -17,6 +17,7 @@ const {
   sendMessage,
   createNewChat,
   deleteChat,
+  renameChat,
   isTyping,
 } = useChat();
 
@@ -54,13 +55,14 @@ const {
           }
         `}
         >
-    <ChatSidebar
+   <ChatSidebar
   setSidebarOpen={setSidebarOpen}
   conversations={conversations}
   currentChatId={currentChatId}
   setCurrentChatId={setCurrentChatId}
   createNewChat={createNewChat}
   deleteChat={deleteChat}
+  renameChat={renameChat}
 />
         </aside>
 

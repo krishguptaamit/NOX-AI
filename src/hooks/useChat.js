@@ -113,6 +113,21 @@ This is a temporary NOX AI response.`,
     setCurrentChatId(newChat.id);
   };
 
+  const renameChat = (chatId, newTitle) => {
+  if (!newTitle.trim()) return;
+
+  setConversations((prev) =>
+    prev.map((chat) =>
+      chat.id === chatId
+        ? {
+            ...chat,
+            title: newTitle.trim(),
+          }
+        : chat
+    )
+  );
+};
+
   const deleteChat = (chatId) => {
   // Agar sirf 1 chat hai to delete mat karo
   if (conversations.length === 1) return;
@@ -155,6 +170,7 @@ useEffect(() => {
   sendMessage,
   createNewChat,
   deleteChat,
+  renameChat,
   isTyping,
 };
 }

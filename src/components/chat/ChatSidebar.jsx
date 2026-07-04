@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Plus,
   MessageSquare,
@@ -13,7 +14,12 @@ export default function ChatSidebar({
   setCurrentChatId,
   createNewChat,
   deleteChat,
+  renameChat,
 }) {
+
+const [editingChatId, setEditingChatId] = useState(null);
+const [editingTitle, setEditingTitle] = useState("");
+
   return (
     <div
       className="
@@ -134,9 +140,38 @@ export default function ChatSidebar({
   >
     <MessageSquare size={17} />
 
-    <span className="truncate">
-      {chat.title}
-    </span>
+    {editingChatId === chat.id ? (
+  <input
+    autoFocus
+    value={editingTitle}
+    onChange={(e) => setEditingTitle(e.target.value)}
+    onBlur={() => {
+      renameChat(chat.id, editingTitle);
+      setEditingChatId(null);
+    }}
+    onKeyDown={(e) => {
+      if (e.key === "Enter") {
+        renameChat(chat.id, editingTitle);
+        setEditingChatId(null);
+      }
+
+      if (e.key === "Escape") {
+        setEditingChatId(null);
+      }
+    }}
+    className="w-full bg-transparent outline-none text-white"
+  />
+) : (
+  <span
+    onDoubleClick={() => {
+      setEditingChatId(chat.id);
+      setEditingTitle(chat.title);
+    }}
+    className="truncate cursor-text"
+  >
+    {chat.title}
+  </span>
+)}
   </button>
 
   {conversations.length > 1 && (
