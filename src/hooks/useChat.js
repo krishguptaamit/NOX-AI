@@ -13,6 +13,7 @@ export default function useChat() {
     {
       id: 1,
       title: "New Chat",
+      pinned: false,
       messages: [
         {
           id: 1,
@@ -99,6 +100,7 @@ This is a temporary NOX AI response.`,
     const newChat = {
       id: Date.now(),
       title: "New Chat",
+      pinned: false,
       messages: [
         {
           id: Date.now() + 1,
@@ -122,6 +124,19 @@ This is a temporary NOX AI response.`,
         ? {
             ...chat,
             title: newTitle.trim(),
+          }
+        : chat
+    )
+  );
+};
+
+const pinChat = (chatId) => {
+  setConversations((prev) =>
+    prev.map((chat) =>
+      chat.id === chatId
+        ? {
+            ...chat,
+            pinned: !chat.pinned,
           }
         : chat
     )
@@ -171,6 +186,7 @@ useEffect(() => {
   createNewChat,
   deleteChat,
   renameChat,
-  isTyping,
+pinChat,
+isTyping,
 };
 }

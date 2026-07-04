@@ -19,6 +19,7 @@ const {
   deleteChat,
   renameChat,
   isTyping,
+  pinChat,
 } = useChat();
 
   return (
@@ -33,7 +34,7 @@ const {
         />
       )}
 
-      <div className="flex h-full gap-6">
+      <div className="flex h-full gap-8">
 
         {/* Sidebar */}
 
@@ -43,7 +44,7 @@ const {
           top-0 left-0
           z-50
           h-screen xl:h-full
-          w-[300px]
+          w-[85vw] sm:w-[320px] xl:w-[300px]
           shrink-0
           transition-transform duration-300
           bg-[#090511]
@@ -63,6 +64,7 @@ const {
   createNewChat={createNewChat}
   deleteChat={deleteChat}
   renameChat={renameChat}
+  pinChat={pinChat}
 />
         </aside>
 
