@@ -113,6 +113,22 @@ This is a temporary NOX AI response.`,
     setCurrentChatId(newChat.id);
   };
 
+  const deleteChat = (chatId) => {
+  // Agar sirf 1 chat hai to delete mat karo
+  if (conversations.length === 1) return;
+
+  const updatedChats = conversations.filter(
+    (chat) => chat.id !== chatId
+  );
+
+  setConversations(updatedChats);
+
+  // Agar current chat delete hui to pehli chat open karo
+  if (currentChatId === chatId) {
+    setCurrentChatId(updatedChats[0].id);
+  }
+};
+
   useEffect(() => {
 
   localStorage.setItem(
@@ -132,12 +148,13 @@ useEffect(() => {
 }, [currentChatId]);
 
   return {
-    conversations,
-    currentChatId,
-    setCurrentChatId,
-    messages,
-    sendMessage,
-    createNewChat,
-    isTyping,
-  };
+  conversations,
+  currentChatId,
+  setCurrentChatId,
+  messages,
+  sendMessage,
+  createNewChat,
+  deleteChat,
+  isTyping,
+};
 }

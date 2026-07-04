@@ -3,6 +3,7 @@ import {
   MessageSquare,
   Crown,
   X,
+  Trash2,
 } from "lucide-react";
 
 export default function ChatSidebar({
@@ -11,6 +12,7 @@ export default function ChatSidebar({
   currentChatId,
   setCurrentChatId,
   createNewChat,
+  deleteChat,
 }) {
   return (
     <div
@@ -105,40 +107,51 @@ export default function ChatSidebar({
 
     {conversations.map((chat) => (
 
-      <button
-        key={chat.id}
-        onClick={() => {
-          setCurrentChatId(chat.id);
-          setSidebarOpen(false);
-        }}
-        className={`
-          w-full
-          flex
-          items-center
-          gap-3
-          px-3
-          py-3
-          rounded-xl
-          text-left
-          transition
+      <div
+  key={chat.id}
+  className={`
+    group
+    flex
+    items-center
+    justify-between
+    rounded-xl
+    px-3
+    py-3
+    transition
+    ${
+      currentChatId === chat.id
+        ? "bg-violet-600"
+        : "hover:bg-violet-500/10"
+    }
+  `}
+>
+  <button
+    onClick={() => {
+      setCurrentChatId(chat.id);
+      setSidebarOpen(false);
+    }}
+    className="flex flex-1 items-center gap-3 text-left"
+  >
+    <MessageSquare size={17} />
 
-          ${
-            currentChatId === chat.id
-              ? "bg-violet-600 text-white"
-              : "hover:bg-violet-500/10"
-          }
-        `}
-      >
+    <span className="truncate">
+      {chat.title}
+    </span>
+  </button>
 
-        <MessageSquare size={17} />
-
-        <span className="truncate">
-
-          {chat.title}
-
-        </span>
-
-      </button>
+  {conversations.length > 1 && (
+    <button
+      onClick={() => {
+        if (window.confirm("Delete this chat?")) {
+          deleteChat(chat.id);
+        }
+      }}
+      className="opacity-0 group-hover:opacity-100 transition"
+    >
+      <Trash2 size={16} />
+    </button>
+  )}
+</div>
 
     ))}
 

@@ -16,6 +16,7 @@ const {
   messages,
   sendMessage,
   createNewChat,
+  deleteChat,
   isTyping,
 } = useChat();
 
@@ -53,12 +54,13 @@ const {
           }
         `}
         >
-         <ChatSidebar
+    <ChatSidebar
   setSidebarOpen={setSidebarOpen}
   conversations={conversations}
   currentChatId={currentChatId}
   setCurrentChatId={setCurrentChatId}
   createNewChat={createNewChat}
+  deleteChat={deleteChat}
 />
         </aside>
 
@@ -77,9 +79,12 @@ const {
           overflow-hidden
         "
         >
-          <ChatHeader
-            setSidebarOpen={setSidebarOpen}
-          />
+         <ChatHeader
+  setSidebarOpen={setSidebarOpen}
+  createNewChat={createNewChat}
+  deleteChat={deleteChat}
+  currentChatId={currentChatId}
+/>
 
           {/* ONLY ONE SCROLL */}
 

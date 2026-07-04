@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Menu,
   Sparkles,
@@ -5,12 +6,20 @@ import {
   Share2,
   Trash2,
 } from "lucide-react";
+import DeleteChatModal from "./DeleteChatModal";
+
 
 export default function ChatHeader({
   setSidebarOpen,
+  createNewChat,
+  deleteChat,
+  currentChatId,
 }) {
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   return (
+    <>
     <header className="flex items-center justify-between border-b border-white/10 bg-[#14101D] px-4 py-4 md:px-6">
+    
 
       {/* Left */}
 
@@ -43,7 +52,10 @@ export default function ChatHeader({
 
       <div className="flex items-center gap-2">
 
-        <button className="hidden sm:flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 hover:bg-violet-500/10 transition">
+       <button
+  onClick={createNewChat}
+  className="hidden sm:flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 hover:bg-violet-500/10 transition"
+>
 
           <Plus size={16} />
 
@@ -57,13 +69,18 @@ export default function ChatHeader({
           <Share2 size={18} />
         </button>
 
-        <button className="hidden md:flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 hover:bg-red-500/20 transition">
+        <button
+    onClick={() => setShowDeleteModal(true)}
+  className="hidden md:flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 hover:bg-red-500/20 transition"
+>
           <Trash2 size={18} />
         </button>
 
         {/* Mobile */}
 
-        <button className="sm:hidden flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600">
+        <button 
+         onClick={createNewChat}
+        className="sm:hidden flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600">
 
           <Plus size={20} />
 
@@ -72,5 +89,15 @@ export default function ChatHeader({
       </div>
 
     </header>
+
+    <DeleteChatModal
+  open={showDeleteModal}
+  onClose={() => setShowDeleteModal(false)}
+  onDelete={() => {
+    deleteChat(currentChatId);
+    setShowDeleteModal(false);
+  }}
+/>
+</>
   );
 }
