@@ -5,9 +5,11 @@ import ChatHeader from "../components/chat/ChatHeader";
 import ChatWelcome from "../components/chat/ChatWelcome";
 import ChatInput from "../components/chat/ChatInput";
 import RightPanel from "../components/chat/RightPanel";
+import useChat from "../hooks/useChat";
 
 export default function AIChat() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { messages, sendMessage } = useChat();
 
   return (
     <div className="relative h-[calc(100vh-96px)]">
@@ -71,11 +73,15 @@ export default function AIChat() {
 
           <div className="flex-1 overflow-y-auto">
 
-            <ChatMessages />
+            <ChatMessages
+  messages={messages}
+/>
 
           </div>
 
-          <ChatInput />
+          <ChatInput
+  sendMessage={sendMessage}
+/>
 
         </section>
 

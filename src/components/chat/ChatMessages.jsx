@@ -1,21 +1,20 @@
 import MessageBubble from "./MessageBubble";
-import TypingIndicator from "./TypingIndicator";
 
-export default function ChatMessages() {
+export default function ChatMessages({
+  messages,
+}) {
   return (
-    <div className="space-y-10 px-4 py-8 md:px-8">
+    <div className="space-y-8 px-5 py-8">
 
-      <MessageBubble
-        sender="user"
-        text="Create a beautiful React dashboard UI."
-      />
+      {messages.map((message) => (
 
-      <MessageBubble
-        sender="ai"
-        text="Absolutely! I can create a premium React dashboard with a modern purple futuristic UI, glassmorphism effects, responsive layout and smooth animations."
-      />
+        <MessageBubble
+          key={message.id}
+          sender={message.sender}
+          text={message.text}
+        />
 
-      <TypingIndicator />
+      ))}
 
     </div>
   );
