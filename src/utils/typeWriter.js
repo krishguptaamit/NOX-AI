@@ -1,8 +1,14 @@
-export async function typeWriter(text, onUpdate, speed = 15) {
+export async function typeWriter(
+  text,
+  onUpdate,
+  speed = 15
+) {
   let current = "";
 
   for (let i = 0; i < text.length; i++) {
+
     current += text[i];
+
     onUpdate(current);
 
     await new Promise((resolve) =>

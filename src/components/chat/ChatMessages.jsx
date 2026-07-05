@@ -5,6 +5,13 @@ import TypingIndicator from "./TypingIndicator";
 export default function ChatMessages({
   messages,
   isTyping,
+  regenerateResponse,
+
+  editingMessageId,
+  editingText,
+  setEditingText,
+  editMessage,
+  saveEditedMessage,
 }) {
   const bottomRef = useRef(null);
 
@@ -19,11 +26,20 @@ export default function ChatMessages({
 
       {messages.map((message) => (
 
-        <MessageBubble
-          key={message.id}
-          sender={message.sender}
-          text={message.text}
-        />
+    <MessageBubble
+  key={message.id}
+  sender={message.sender}
+  text={message.text}
+  regenerateResponse={regenerateResponse}
+
+  editingMessageId={editingMessageId}
+  editingText={editingText}
+  setEditingText={setEditingText}
+  editMessage={editMessage}
+  saveEditedMessage={saveEditedMessage}
+
+  messageId={message.id}
+/>
 
       ))}
 

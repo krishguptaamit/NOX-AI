@@ -15,6 +15,14 @@ const {
   setCurrentChatId,
   messages,
   sendMessage,
+  regenerateResponse,
+
+  editingMessageId,
+  editingText,
+  setEditingText,
+  editMessage,
+  saveEditedMessage,
+
   createNewChat,
   deleteChat,
   renameChat,
@@ -93,10 +101,16 @@ const {
           {/* ONLY ONE SCROLL */}
 
           <div className="flex-1 overflow-y-auto">
-
-       <ChatMessages
+<ChatMessages
   messages={messages}
   isTyping={isTyping}
+  regenerateResponse={regenerateResponse}
+
+  editingMessageId={editingMessageId}
+  editingText={editingText}
+  setEditingText={setEditingText}
+  editMessage={editMessage}
+  saveEditedMessage={saveEditedMessage}
 />
 
           </div>

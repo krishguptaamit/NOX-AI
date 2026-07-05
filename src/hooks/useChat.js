@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { askAI } from "../services/aiService";
 import { typeWriter } from "../utils/typeWriter";
 
+
 export default function useChat() {
  const [conversations, setConversations] = useState(() => {
 
@@ -37,12 +38,29 @@ const [currentChatId, setCurrentChatId] = useState(() => {
 });
 
   const [isTyping, setIsTyping] = useState(false);
+  const [editingMessageId, setEditingMessageId] = useState(null);
+const [editingText, setEditingText] = useState("");
 
   const currentConversation = conversations.find(
     (chat) => chat.id === currentChatId
   );
 
   const messages = currentConversation?.messages || [];
+
+  async function generateAIResponse(apiMessages) {
+  setIsTyping(true);
+
+  try {
+    const result = await askAI(apiMessages);
+
+    return result.content;
+  } catch (error) {
+    console.error(error);
+    return "❌ Failed to connect to NOX AI.";
+  } finally {
+    setIsTyping(false);
+  }
+}
 
   const sendMessage = async (text) => {
     if (!text.trim()) return;
@@ -73,12 +91,24 @@ const [currentChatId, setCurrentChatId] = useState(() => {
    setIsTyping(true);
 
 try {
-  const result = await askAI([
+  const currentConversation = conversations.find(
+  (chat) => chat.id === currentChatId
+);
+
+const aiMessages = currentConversation.messages.map((msg) => ({
+  role: msg.sender === "user" ? "user" : "assistant",
+  content: msg.text,
+}));
+
+const result = {
+  content: await generateAIResponse([
+    ...aiMessages,
     {
       role: "user",
       content: text,
     },
-  ]);
+  ]),
+};
 
  const aiId = Date.now() + 1;
 
@@ -155,6 +185,25 @@ setIsTyping(false);
     
   };
 
+  const regenerateResponse = async () => {
+  const currentConversation = conversations.find(
+    (chat) => chat.id === currentChatId
+  );
+
+  if (!currentConversation) return;
+
+  const messages = currentConversation.messages;
+
+  // Last user message dhoondo
+  const lastUserMessage = [...messages]
+    .reverse()
+    .find((msg) => msg.sender === "user");
+
+  if (!lastUserMessage) return;
+
+  await sendMessage(lastUserMessage.text);
+};
+
   const createNewChat = () => {
     const newChat = {
       id: Date.now(),
@@ -173,6 +222,101 @@ setIsTyping(false);
 
     setCurrentChatId(newChat.id);
   };
+
+  const editMessage = (messageId, text) => {
+  setEditingMessageId(messageId);
+  setEditingText(text);
+};
+
+const saveEditedMessage = async () => {
+  if (!editingText.trim()) return;
+
+  const currentConversation = conversations.find(
+    (chat) => chat.id === currentChatId
+  );
+
+  if (!currentConversation) return;
+
+  // Updated messages
+  const updatedMessages = currentConversation.messages.map((msg) =>
+    msg.id === editingMessageId
+      ? {
+          ...msg,
+          text: editingText,
+        }
+      : msg
+  );
+
+  // Edited message ka index
+  const editedIndex = updatedMessages.findIndex(
+    (msg) => msg.id === editingMessageId
+  );
+
+  // Sirf edited message tak rakho
+  const history = updatedMessages.slice(0, editedIndex + 1);
+
+  setConversations((prev) =>
+    prev.map((chat) =>
+      chat.id === currentChatId
+        ? {
+            ...chat,
+            messages: history,
+          }
+        : chat
+    )
+  );
+
+  setEditingMessageId(null);
+  setEditingText("");
+
+  // API messages
+  const apiMessages = history.map((msg) => ({
+    role: msg.sender === "user" ? "user" : "assistant",
+    content: msg.text,
+  }));
+
+  const aiId = Date.now();
+
+  setConversations((prev) =>
+    prev.map((chat) =>
+      chat.id === currentChatId
+        ? {
+            ...chat,
+            messages: [
+              ...history,
+              {
+                id: aiId,
+                sender: "ai",
+                text: "",
+              },
+            ],
+          }
+        : chat
+    )
+  );
+
+  const result = await generateAIResponse(apiMessages);
+
+  await typeWriter(result, (currentText) => {
+    setConversations((prev) =>
+      prev.map((chat) =>
+        chat.id === currentChatId
+          ? {
+              ...chat,
+              messages: chat.messages.map((msg) =>
+                msg.id === aiId
+                  ? {
+                      ...msg,
+                      text: currentText,
+                    }
+                  : msg
+              ),
+            }
+          : chat
+      )
+    );
+  });
+};
 
   const renameChat = (chatId, newTitle) => {
   if (!newTitle.trim()) return;
@@ -236,16 +380,24 @@ useEffect(() => {
 
 }, [currentChatId]);
 
-  return {
+return {
   conversations,
   currentChatId,
   setCurrentChatId,
   messages,
   sendMessage,
+  regenerateResponse,
+
+  editingMessageId,
+  editingText,
+  setEditingText,
+  editMessage,
+  saveEditedMessage,
+
   createNewChat,
   deleteChat,
   renameChat,
-pinChat,
-isTyping,
+  pinChat,
+  isTyping,
 };
 }
