@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   askAI,
   askAIStream,
 } from "../services/aiService";
 import { AI_PROVIDERS } from "../config/providers";
+import { fileToBase64 } from "../utils/fileToBase64";
+import { AI_MODELS } from "../config/models";
 
 
 
@@ -12,6 +14,8 @@ export default function useChat() {
   const [provider, setProvider] = useState(
   AI_PROVIDERS.AUTO
 );
+
+const abortControllerRef = useRef(null);
 
 const [theme, setTheme] = useState(() => {
   return localStorage.getItem("nox-theme") || "dark";
@@ -83,14 +87,25 @@ const [editingText, setEditingText] = useState("");
 }
 
   const sendMessage = async (text, file = null) => {
-    if (!text.trim()) return;
+    if (!text.trim() && !file) return;
+
+    let imageBase64 = null;
+
+if (file && file.type.startsWith("image/")) {
+  imageBase64 = await fileToBase64(file);
+}
 
    const userMessage = {
   id: Date.now(),
   sender: "user",
   text,
   file,
+  imageBase64,
 };
+
+//check
+console.log(userMessage);
+
     setConversations((prev) =>
   prev.map((chat) => {
     if (chat.id !== currentChatId) return chat;
@@ -116,10 +131,30 @@ try {
   (chat) => chat.id === currentChatId
 );
 
-const aiMessages = currentConversation.messages.map((msg) => ({
-  role: msg.sender === "user" ? "user" : "assistant",
-  content: msg.text,
-}));
+const aiMessages = currentConversation.messages.map((msg) => {
+  if (msg.imageBase64) {
+    return {
+      role: msg.sender === "user" ? "user" : "assistant",
+      content: [
+        {
+          type: "text",
+          text: msg.text,
+        },
+        {
+          type: "image_url",
+          image_url: {
+            url: msg.imageBase64,
+          },
+        },
+      ],
+    };
+  }
+
+  return {
+    role: msg.sender === "user" ? "user" : "assistant",
+    content: msg.text,
+  };
+});
 
 const aiId = Date.now() + 1;
 
@@ -142,14 +177,31 @@ setConversations((prev) =>
 );
 
 let fullText = "";
+abortControllerRef.current = new AbortController();
 
 await askAIStream(
   [
     ...aiMessages,
-    {
-      role: "user",
-      content: text,
-    },
+    imageBase64
+      ? {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text,
+            },
+            {
+              type: "image_url",
+              image_url: {
+                url: imageBase64,
+              },
+            },
+          ],
+        }
+      : {
+          role: "user",
+          content: text,
+        },
   ],
   provider,
   (chunk) => {
@@ -172,18 +224,14 @@ await askAIStream(
           : chat
       )
     );
-  }
+  },
+  imageBase64
+    ? AI_MODELS.VISION
+    : AI_MODELS.CHAT,
+
+    abortControllerRef.current.signal
 );
-  // setConversations((prev) =>
-  //   prev.map((chat) =>
-  //     chat.id === currentChatId
-  //       ? {
-  //           ...chat,
-  //           messages: [...chat.messages, aiMessage],
-  //         }
-  //       : chat
-  //   )
-  // );
+
 } catch (error) {
   console.error(error);
 
@@ -227,6 +275,11 @@ setIsTyping(false);
 
   await sendMessage(lastUserMessage.text);
 };
+
+// const stopGeneration = () => {
+//   abortControllerRef.current?.abort();
+//   setIsTyping(false);
+// };
 
   const createNewChat = () => {
     const newChat = {
@@ -465,5 +518,7 @@ voiceLanguage,
 setVoiceLanguage,
 
 clearCurrentChat,
+isTyping,
+// stopGeneration,
 };
 }

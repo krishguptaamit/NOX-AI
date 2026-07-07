@@ -15,6 +15,7 @@ import MarkdownMessage from "./MarkdownMessage";
 export default function MessageBubble({
   sender,
   text,
+  imageBase64,
   messageId,
   regenerateResponse,
 
@@ -121,7 +122,17 @@ const copyMessage = async () => {
 
   </div>
 ) : (
-  <MarkdownMessage content={text} />
+  <>
+    {isUser && imageBase64 && (
+      <img
+        src={imageBase64}
+        alt="Uploaded"
+        className="mb-4 max-h-72 w-full rounded-2xl object-cover border border-white/10"
+      />
+    )}
+
+    <MarkdownMessage content={text} />
+  </>
 )}
         </div>
 

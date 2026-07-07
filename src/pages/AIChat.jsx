@@ -40,6 +40,7 @@ const {
 setVoiceLanguage,
 
 clearCurrentChat,
+// stopGeneration,
 } = useChat();
 
   return (
@@ -140,9 +141,11 @@ setVoiceLanguage={setVoiceLanguage}
 
           </div>
 
-          <ChatInput
-   sendMessage={sendMessage}
+      <ChatInput
+  sendMessage={sendMessage}
   voiceLanguage={voiceLanguage}
+  isTyping={isTyping}
+  // stopGeneration={stopGeneration}
 />
 
         </section>

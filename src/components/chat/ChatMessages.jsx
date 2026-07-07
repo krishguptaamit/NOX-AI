@@ -30,6 +30,7 @@ export default function ChatMessages({
   key={message.id}
   sender={message.sender}
   text={message.text}
+  imageBase64={message.imageBase64}
   regenerateResponse={regenerateResponse}
 
   editingMessageId={editingMessageId}

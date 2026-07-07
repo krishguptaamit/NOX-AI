@@ -4,7 +4,7 @@ import { AI_PROVIDERS } from "../config/providers";
 
 const API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
 
-export async function askAI(messages, provider) {
+export async function askAI(messages, provider, model = AI_MODELS.CHAT) {
 
   // 🚀 Groq Only
   if (provider === AI_PROVIDERS.GROQ) {
@@ -23,7 +23,7 @@ export async function askAI(messages, provider) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: AI_MODELS.DEFAULT,
+          model,
           messages,
         }),
       }
@@ -52,7 +52,7 @@ export async function askAI(messages, provider) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: AI_MODELS.DEFAULT,
+        model,
           messages,
         }),
       }
@@ -81,7 +81,13 @@ export async function askAI(messages, provider) {
   }
 }
 
-export async function askAIStream(messages, provider, onChunk) {
+export async function askAIStream(
+  messages,
+  provider,
+  onChunk,
+  model = null,
+  // signal
+) {
   const API_KEY =
     provider === AI_PROVIDERS.GROQ
       ? import.meta.env.VITE_GROQ_API_KEY
@@ -98,15 +104,31 @@ export async function askAIStream(messages, provider, onChunk) {
       Authorization: `Bearer ${API_KEY}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      model:
-        provider === AI_PROVIDERS.GROQ
-          ? "llama-3.3-70b-versatile"
-          : AI_MODELS.DEFAULT,
-      messages,
-      stream: true,
-    }),
+
+      // signal, 
+
+   body: JSON.stringify({
+  model:
+    model ||
+    (
+      provider === AI_PROVIDERS.GROQ
+        ? "llama-3.3-70b-versatile"
+        : AI_MODELS.CHAT
+    ),
+
+  messages,
+  stream: true,
+}),
   });
+
+  if (!response.ok) {
+  const error = await response.text();
+
+  console.error("========== OpenRouter Stream Error ==========");
+  console.error(error);
+
+  throw new Error(error);
+}
 
   const reader = response.body.getReader();
   const decoder = new TextDecoder();

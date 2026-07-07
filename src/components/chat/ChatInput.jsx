@@ -11,8 +11,10 @@ import {
 import { MicOff } from "lucide-react";
 
 export default function ChatInput({
- sendMessage,
+  sendMessage,
   voiceLanguage,
+  isTyping,
+  stopGeneration,
 }) {
   const [message, setMessage] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
@@ -167,12 +169,20 @@ recognition.onresult = (event) => {
       >
 
         <input
-          id="file-upload"
-          type="file"
-          className="hidden"
-          accept="image/*,.pdf,.txt"
-          onChange={handleFileChange}
-        />
+  id="file-upload"
+  type="file"
+  className="hidden"
+  accept=".pdf,.txt,.doc,.docx"
+  onChange={handleFileChange}
+/>
+
+<input
+  id="image-upload"
+  type="file"
+  className="hidden"
+  accept="image/*"
+  onChange={handleFileChange}
+/>
 
         {dragging && (
           <div className="mb-4 rounded-2xl border-2 border-dashed border-violet-500 bg-violet-500/10 p-8 text-center">
@@ -270,7 +280,7 @@ recognition.onresult = (event) => {
             </label>
 
             <label
-              htmlFor="file-upload"
+              htmlFor="image-upload"
               className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl transition hover:bg-violet-500/10"
               title="Upload Image"
             >
@@ -306,29 +316,33 @@ recognition.onresult = (event) => {
 
           </div>
 
-          <button
-            type="button"
-            onClick={handleSend}
-            disabled={!message.trim() && !selectedFile}
-            className={`
-              flex
-              h-11
-              w-11
-              items-center
-              justify-center
-              rounded-2xl
-              transition
+         <button
+  type="button"
+  onClick={isTyping ? stopGeneration : handleSend}
+  className={`
+    flex
+    h-11
+    w-11
+    items-center
+    justify-center
+    rounded-2xl
+    transition
 
-              ${
-                message.trim() || selectedFile
-                  ? "bg-gradient-to-r from-violet-600 to-fuchsia-600 shadow-[0_0_25px_rgba(139,92,246,.4)] hover:scale-105"
-                  : "cursor-not-allowed bg-white/10 opacity-50"
-              }
-            `}
-          >
-            <SendHorizontal size={18} />
-          </button>
-
+    ${
+      isTyping
+        ? "bg-red-600 hover:bg-red-500"
+        : message.trim() || selectedFile
+        ? "bg-gradient-to-r from-violet-600 to-fuchsia-600 shadow-[0_0_25px_rgba(139,92,246,.4)] hover:scale-105"
+        : "cursor-not-allowed bg-white/10 opacity-50"
+    }
+  `}
+>
+  {isTyping ? (
+    <div className="h-3 w-3 rounded-sm bg-white" />
+  ) : (
+    <SendHorizontal size={18} />
+  )}
+</button>
         </div>
 
       </div>
