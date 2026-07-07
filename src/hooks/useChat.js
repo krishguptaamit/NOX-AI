@@ -1,13 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   askAI,
   askAIStream,
 } from "../services/aiService";
 import { AI_PROVIDERS } from "../config/providers";
-import { fileToBase64 } from "../utils/fileToBase64";
 import { AI_MODELS } from "../config/models";
-
-
+import { fileToBase64 } from "../utils/fileToBase64";
 
 export default function useChat() {
 
@@ -15,7 +13,7 @@ export default function useChat() {
   AI_PROVIDERS.AUTO
 );
 
-const abortControllerRef = useRef(null);
+// const abortControllerRef = useRef(null);
 
 const [theme, setTheme] = useState(() => {
   return localStorage.getItem("nox-theme") || "dark";
@@ -86,6 +84,35 @@ const [editingText, setEditingText] = useState("");
   }
 }
 
+
+
+async function generateChatTitle(firstMessage) {
+  try {
+    const result = await askAI(
+      [
+        {
+          role: "system",
+          content:
+            "Generate a very short chat title (maximum 4 words). Return only the title. No quotes. No punctuation.",
+        },
+        {
+          role: "user",
+          content: firstMessage,
+        },
+      ],
+      provider
+    );
+
+    return result.content.trim();
+  } catch (error) {
+    console.error(error);
+
+    return firstMessage.length > 30
+      ? firstMessage.substring(0, 30) + "..."
+      : firstMessage;
+  }
+}
+
   const sendMessage = async (text, file = null) => {
     if (!text.trim() && !file) return;
 
@@ -104,25 +131,19 @@ if (file && file.type.startsWith("image/")) {
 };
 
 //check
-console.log(userMessage);
+// console.log(userMessage);
 
-    setConversations((prev) =>
+   setConversations((prev) =>
   prev.map((chat) => {
     if (chat.id !== currentChatId) return chat;
 
-    const shouldUpdateTitle = chat.title === "New Chat";
-
     return {
       ...chat,
-      title: shouldUpdateTitle
-        ? text.length > 30
-          ? text.substring(0, 30) + "..."
-          : text
-        : chat.title,
       messages: [...chat.messages, userMessage],
     };
   })
 );
+
 
    setIsTyping(true);
 
@@ -177,7 +198,6 @@ setConversations((prev) =>
 );
 
 let fullText = "";
-abortControllerRef.current = new AbortController();
 
 await askAIStream(
   [
@@ -229,8 +249,27 @@ await askAIStream(
     ? AI_MODELS.VISION
     : AI_MODELS.CHAT,
 
-    abortControllerRef.current.signal
 );
+
+const currentChat = conversations.find(
+  (chat) => chat.id === currentChatId
+);
+
+if (currentChat?.title === "New Chat") {
+  const aiTitle = await generateChatTitle(text);
+
+  setConversations((prev) =>
+    prev.map((chat) =>
+      chat.id === currentChatId
+        ? {
+            ...chat,
+            title: aiTitle,
+          }
+        : chat
+    )
+  );
+}
+
 
 } catch (error) {
   console.error(error);
@@ -251,10 +290,10 @@ await askAIStream(
         : chat
     )
   );
-}
+}finally{
 
 setIsTyping(false);
-    
+}
   };
 
   const regenerateResponse = async () => {
@@ -518,7 +557,7 @@ voiceLanguage,
 setVoiceLanguage,
 
 clearCurrentChat,
-isTyping,
+
 // stopGeneration,
 };
 }

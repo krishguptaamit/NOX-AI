@@ -57,6 +57,25 @@ export default function ChatInput({
     handleFile(file);
   };
 
+  const handlePaste = (e) => {
+  const items = e.clipboardData?.items;
+
+  if (!items) return;
+
+  for (const item of items) {
+    if (item.type.startsWith("image")) {
+      const file = item.getAsFile();
+
+      if (file) {
+        handleFile(file);
+      }
+
+      e.preventDefault();
+      break;
+    }
+  }
+};
+
   const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -263,6 +282,7 @@ recognition.onresult = (event) => {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
+          onPaste={handlePaste}
           placeholder="Ask NOXVERSE AI anything..."
           className="w-full resize-none bg-transparent px-2 py-2 text-white placeholder:text-gray-500 outline-none"
         />
