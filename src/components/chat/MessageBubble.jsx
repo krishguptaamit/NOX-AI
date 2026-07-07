@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import MarkdownMessage from "./MarkdownMessage";
 
+
 export default function MessageBubble({
   sender,
   text,

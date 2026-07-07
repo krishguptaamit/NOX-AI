@@ -54,7 +54,7 @@ export default function ChatWelcome() {
 
           <span className="bg-gradient-to-r from-violet-400 to-fuchsia-500 bg-clip-text text-transparent">
 
-            NOX AI
+            NOXVERSE AI
 
           </span>
 
@@ -62,9 +62,8 @@ export default function ChatWelcome() {
 
         <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-gray-400 sm:text-base md:text-lg">
 
-          Ask questions, write code, generate images,
-          summarize PDFs, brainstorm ideas and create
-          anything with AI.
+           Experience the next generation of AI for coding, research,
+  writing, creativity, and productivity—all in one place.
 
         </p>
 

@@ -14,7 +14,7 @@ export default function Navbar({ setSidebarOpen }) {
   const [notifications, setNotifications] = useState([
   {
     id: 1,
-    title: "Welcome to NOX AI",
+    title: "Welcome to NOXVERSE AI",
     read: false,
   },
   {

@@ -9,6 +9,7 @@ import useChat from "../hooks/useChat";
 
 export default function AIChat() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [rightPanelOpen, setRightPanelOpen] = useState(true);
 const {
   conversations,
   currentChatId,
@@ -28,6 +29,17 @@ const {
   renameChat,
   isTyping,
   pinChat,
+
+  provider,
+  setProvider,
+
+  theme,
+  setTheme,
+
+  voiceLanguage,
+setVoiceLanguage,
+
+clearCurrentChat,
 } = useChat();
 
   return (
@@ -42,7 +54,7 @@ const {
         />
       )}
 
-      <div className="flex h-full gap-8">
+      <div className="flex h-full gap-4 xl:gap-6 2xl:gap-8">
 
         {/* Sidebar */}
 
@@ -52,7 +64,10 @@ const {
           top-0 left-0
           z-50
           h-screen xl:h-full
-          w-[85vw] sm:w-[320px] xl:w-[300px]
+          w-[85vw]
+sm:w-[320px]
+xl:w-[280px]
+2xl:w-[300px]
           shrink-0
           transition-transform duration-300
           bg-[#090511]
@@ -82,6 +97,7 @@ const {
           className="
           flex-1
           min-w-0
+          w-0
           rounded-3xl
           border
           border-white/10
@@ -91,11 +107,20 @@ const {
           overflow-hidden
         "
         >
-         <ChatHeader
+       <ChatHeader
   setSidebarOpen={setSidebarOpen}
   createNewChat={createNewChat}
   deleteChat={deleteChat}
   currentChatId={currentChatId}
+
+  provider={provider}
+  setProvider={setProvider}
+
+   theme={theme}
+  setTheme={setTheme}
+
+  voiceLanguage={voiceLanguage}
+setVoiceLanguage={setVoiceLanguage}
 />
 
           {/* ONLY ONE SCROLL */}
@@ -116,18 +141,36 @@ const {
           </div>
 
           <ChatInput
-  sendMessage={sendMessage}
+   sendMessage={sendMessage}
+  voiceLanguage={voiceLanguage}
 />
 
         </section>
 
         {/* Right */}
 
-        <aside className="hidden 2xl:block w-[320px] shrink-0">
-
-          <RightPanel />
-
-        </aside>
+       <aside
+  className={`
+    hidden
+2xl:block
+shrink-0
+transition-all
+duration-300
+    shrink-0
+    transition-all duration-300
+    ${rightPanelOpen ? "w-[320px]" : "w-[56px]"}
+  `}
+>
+  <RightPanel
+    messages={messages}
+    provider={provider}
+    conversations={conversations}
+    currentChatId={currentChatId}
+    rightPanelOpen={rightPanelOpen}
+    setRightPanelOpen={setRightPanelOpen}
+    clearCurrentChat={clearCurrentChat}
+  />
+</aside>
 
       </div>
 

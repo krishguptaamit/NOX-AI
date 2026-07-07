@@ -1,10 +1,28 @@
 import { useEffect, useState } from "react";
-import { askAI } from "../services/aiService";
-import { typeWriter } from "../utils/typeWriter";
+import {
+  askAI,
+  askAIStream,
+} from "../services/aiService";
+import { AI_PROVIDERS } from "../config/providers";
+
 
 
 export default function useChat() {
+
+  const [provider, setProvider] = useState(
+  AI_PROVIDERS.AUTO
+);
+
+const [theme, setTheme] = useState(() => {
+  return localStorage.getItem("nox-theme") || "dark";
+});
+
+const [voiceLanguage, setVoiceLanguage] = useState(() => {
+  return localStorage.getItem("nox-voice-language") || "auto";
+});
+
  const [conversations, setConversations] = useState(() => {
+
 
   const saved = localStorage.getItem("nox-conversations");
 
@@ -29,6 +47,8 @@ export default function useChat() {
 
 });
 
+
+
 const [currentChatId, setCurrentChatId] = useState(() => {
 
   const saved = localStorage.getItem("nox-current-chat");
@@ -51,7 +71,7 @@ const [editingText, setEditingText] = useState("");
   setIsTyping(true);
 
   try {
-    const result = await askAI(apiMessages);
+    const result = await askAI(apiMessages, provider);
 
     return result.content;
   } catch (error) {
@@ -62,14 +82,15 @@ const [editingText, setEditingText] = useState("");
   }
 }
 
-  const sendMessage = async (text) => {
+  const sendMessage = async (text, file = null) => {
     if (!text.trim()) return;
 
-    const userMessage = {
-      id: Date.now(),
-      sender: "user",
-      text,
-    };
+   const userMessage = {
+  id: Date.now(),
+  sender: "user",
+  text,
+  file,
+};
     setConversations((prev) =>
   prev.map((chat) => {
     if (chat.id !== currentChatId) return chat;
@@ -100,17 +121,7 @@ const aiMessages = currentConversation.messages.map((msg) => ({
   content: msg.text,
 }));
 
-const result = {
-  content: await generateAIResponse([
-    ...aiMessages,
-    {
-      role: "user",
-      content: text,
-    },
-  ]),
-};
-
- const aiId = Date.now() + 1;
+const aiId = Date.now() + 1;
 
 setConversations((prev) =>
   prev.map((chat) =>
@@ -130,26 +141,39 @@ setConversations((prev) =>
   )
 );
 
-await typeWriter(result.content, (currentText) => {
-  setConversations((prev) =>
-    prev.map((chat) =>
-      chat.id === currentChatId
-        ? {
-            ...chat,
-            messages: chat.messages.map((msg) =>
-              msg.id === aiId
-                ? {
-                    ...msg,
-                    text: currentText,
-                  }
-                : msg
-            ),
-          }
-        : chat
-    )
-  );
-});
+let fullText = "";
 
+await askAIStream(
+  [
+    ...aiMessages,
+    {
+      role: "user",
+      content: text,
+    },
+  ],
+  provider,
+  (chunk) => {
+    fullText += chunk;
+
+    setConversations((prev) =>
+      prev.map((chat) =>
+        chat.id === currentChatId
+          ? {
+              ...chat,
+              messages: chat.messages.map((msg) =>
+                msg.id === aiId
+                  ? {
+                      ...msg,
+                      text: fullText,
+                    }
+                  : msg
+              ),
+            }
+          : chat
+      )
+    );
+  }
+);
   // setConversations((prev) =>
   //   prev.map((chat) =>
   //     chat.id === currentChatId
@@ -362,6 +386,26 @@ const pinChat = (chatId) => {
   }
 };
 
+const clearCurrentChat = () => {
+  setConversations((prev) =>
+    prev.map((chat) =>
+      chat.id === currentChatId
+        ? {
+            ...chat,
+            messages: [
+              {
+                id: Date.now(),
+                sender: "ai",
+                text: "Hello 👋 I'm ready to help.",
+              },
+            ],
+            title: "New Chat",
+          }
+        : chat
+    )
+  );
+};
+
   useEffect(() => {
 
   localStorage.setItem(
@@ -379,6 +423,17 @@ useEffect(() => {
   );
 
 }, [currentChatId]);
+
+useEffect(() => {
+  localStorage.setItem("nox-theme", theme);
+}, [theme]);
+
+useEffect(() => {
+  localStorage.setItem(
+    "nox-voice-language",
+    voiceLanguage
+  );
+}, [voiceLanguage]);
 
 return {
   conversations,
@@ -399,5 +454,16 @@ return {
   renameChat,
   pinChat,
   isTyping,
+
+  provider,
+setProvider,
+
+theme,
+setTheme,
+
+voiceLanguage,
+setVoiceLanguage,
+
+clearCurrentChat,
 };
 }
