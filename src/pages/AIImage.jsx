@@ -3,9 +3,13 @@ import PromptPanel from "../components/image/PromptPanel";
 import ImageGallery from "../components/image/ImageGallery";
 import useImage from "../hooks/useImage";
 import ImageViewer from "../components/image/ImageViewer";
+import { useRef } from "react";
+import HistoryModal from "../components/image/HistoryModal";
 
 export default function AIImage() {
 
+  const galleryRef = useRef(null);
+  const settingsRef = useRef(null);
   const image = useImage();
 
   return (
@@ -15,7 +19,19 @@ export default function AIImage() {
 
       <div className="mx-auto flex h-full max-w-[1800px] flex-col gap-6 p-4 lg:p-6">
 
-        <ImageHeader />
+        <ImageHeader
+  onGallery={() =>
+    galleryRef.current?.scrollIntoView({
+      behavior: "smooth",
+    })
+  }
+  onSettings={() =>
+    settingsRef.current?.scrollIntoView({
+      behavior: "smooth",
+    })
+  }
+  onHistory={image.openHistory}
+/>
 
         <div
   className="
@@ -30,7 +46,10 @@ export default function AIImage() {
 
           {/* Left */}
 
-          <div className="min-h-0 overflow-y-auto">
+        <div
+  ref={settingsRef}
+  className="min-h-0 overflow-y-auto"
+>
 
            <PromptPanel
 
@@ -41,14 +60,23 @@ setPrompt={image.setPrompt}
 loading={image.loading}
 
 onGenerate={image.generateAIImage}
+
+onEnhance={image.enhanceCurrentPrompt}
+
+ onSurprise={image.surpriseMe}
+
+ useTemplate={image.useTemplate}
 />
 
           </div>
 
           {/* Right */}
 
-         <div className="min-h-0 overflow-y-auto">
-          
+        <div
+  ref={galleryRef}
+  className="min-h-0 overflow-y-auto"
+>
+
 <ImageGallery
   loading={image.loading}
   images={image.images}
@@ -70,6 +98,16 @@ onGenerate={image.generateAIImage}
       open={image.viewerOpen}
       onClose={image.closeViewer}
    />
+
+   <HistoryModal
+  open={image.historyOpen}
+  images={image.images}
+  onClose={image.closeHistory}
+  onPreview={(img) => {
+    image.closeHistory();
+    image.openViewer(img);
+  }}
+/>
     </>
   );
 }

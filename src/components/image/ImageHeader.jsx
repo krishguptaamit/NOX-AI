@@ -5,7 +5,11 @@ import {
   Settings,
 } from "lucide-react";
 
-export default function ImageHeader() {
+export default function ImageHeader({
+  onGallery,
+  onSettings,
+    onHistory,
+})  {
   return (
     <div className="rounded-[28px] border border-white/10 bg-[#14101D] p-6">
 
@@ -52,6 +56,7 @@ export default function ImageHeader() {
         <div className="flex flex-wrap gap-3">
 
           <button
+          onClick={onHistory}
             className="
               flex
               items-center
@@ -72,6 +77,7 @@ export default function ImageHeader() {
           </button>
 
           <button
+  onClick={onGallery}
             className="
               flex
               items-center
@@ -92,6 +98,7 @@ export default function ImageHeader() {
           </button>
 
           <button
+           onClick={onSettings}
             className="
               flex
               items-center

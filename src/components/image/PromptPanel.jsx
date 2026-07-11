@@ -6,6 +6,9 @@ import {
 } from "lucide-react";
 
 import SettingsPanel from "./SettingsPanel";
+import promptTemplates from "../../data/promptTemplates";
+import { Mic } from "lucide-react";
+import useSpeech from "../../hooks/useSpeech";
 
 const suggestions = [
   "Cyberpunk City",
@@ -15,6 +18,7 @@ const suggestions = [
   "Space Station",
   "Ghibli Village",
 ];
+
 
 export default function PromptPanel({
 
@@ -26,7 +30,18 @@ loading,
 
 onGenerate,
 
+onEnhance,
+
+onSurprise,
+
+useTemplate,
+
 }) {
+
+  const {
+  listening,
+  startListening,
+} = useSpeech(setPrompt);
 
 
   return (
@@ -103,6 +118,30 @@ onGenerate,
         "
       />
 
+      <button
+  onClick={startListening}
+  className="
+    mt-4
+    flex
+    w-full
+    items-center
+    justify-center
+    gap-2
+    rounded-2xl
+    border
+    border-violet-500/30
+    py-3
+    transition
+    hover:bg-violet-600/10
+  "
+>
+  <Mic size={18} />
+
+  {listening
+    ? "Listening..."
+    : "Voice Input"}
+</button>
+
       <div className="mt-2 flex justify-end text-xs text-gray-500">
 
         {prompt.length}/1000
@@ -160,6 +199,97 @@ onGenerate,
         </div>
 
       </div>
+
+      <div className="mt-8">
+
+  <h3 className="mb-3 font-medium">
+    Templates
+  </h3>
+
+  <div className="grid grid-cols-2 gap-3">
+
+    {promptTemplates.map((item) => (
+
+      <button
+        key={item.id}
+        onClick={() => useTemplate(item.prompt)}
+        className="
+          rounded-2xl
+          border
+          border-white/10
+          bg-[#090511]
+          py-4
+          transition
+          hover:border-violet-500
+          hover:bg-violet-600/10
+        "
+      >
+        {item.title}
+      </button>
+
+    ))}
+
+  </div>
+
+</div>
+
+      <button
+  onClick={onEnhance}
+  disabled={loading}
+  className="
+    mt-6
+    flex
+    w-full
+    items-center
+    justify-center
+    gap-2
+    rounded-2xl
+    border
+    border-violet-500/40
+    py-3
+    text-violet-300
+    transition
+    hover:bg-violet-600/10
+    disabled:opacity-50
+  "
+>
+  ✨ Enhance Prompt
+</button>
+
+<div className="mt-5 flex gap-3">
+
+  <button
+    onClick={onEnhance}
+    className="
+      flex-1
+      rounded-2xl
+      border
+      border-violet-500/40
+      py-3
+      transition
+      hover:bg-violet-600/10
+    "
+  >
+    ✨ Enhance
+  </button>
+
+  <button
+    onClick={onSurprise}
+    className="
+      flex-1
+      rounded-2xl
+      border
+      border-white/10
+      py-3
+      transition
+      hover:bg-white/5
+    "
+  >
+    🎲 Surprise Me
+  </button>
+
+</div>
+
           <button
   onClick={onGenerate}
   disabled={loading}

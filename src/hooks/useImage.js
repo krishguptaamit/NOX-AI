@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import { generateImage } from "../services/imageService";
+import { enhancePrompt } from "../services/promptService";
+import randomPrompts from "../data/randomPrompts";
+import promptTemplates from "../data/promptTemplates";
 
 export default function useImage() {
   const [prompt, setPrompt] = useState("");
@@ -17,6 +20,8 @@ export default function useImage() {
   const [selectedImage, setSelectedImage] = useState(null);
 
 const [viewerOpen, setViewerOpen] = useState(false);
+
+const [historyOpen, setHistoryOpen] = useState(false);
 
 useEffect(() => {
   localStorage.setItem(
@@ -48,6 +53,19 @@ function deleteImage(id) {
   );
 }
 
+function useTemplate(prompt) {
+  setPrompt(prompt);
+}
+
+function surpriseMe() {
+  const random =
+    randomPrompts[
+      Math.floor(Math.random() * randomPrompts.length)
+    ];
+
+  setPrompt(random);
+}
+
 function toggleFavorite(id) {
   setImages((prev) =>
     prev.map((img) =>
@@ -59,6 +77,14 @@ function toggleFavorite(id) {
         : img
     )
   );
+}
+
+function openHistory() {
+  setHistoryOpen(true);
+}
+
+function closeHistory() {
+  setHistoryOpen(false);
 }
 
 function clearImages() {
@@ -105,13 +131,27 @@ function clearImages() {
   }
 }
 
-  function deleteImage(id) {
-    setImages((prev) => prev.filter((img) => img.id !== id));
-  }
+async function enhanceCurrentPrompt() {
+  if (!prompt.trim()) return;
 
-  function clearImages() {
-    setImages([]);
+  try {
+    setLoading(true);
+
+    const improved = await enhancePrompt(
+      prompt,
+      "auto"
+    );
+
+    setPrompt(improved);
+
+  } catch (error) {
+    console.error(error);
+
+    alert("Failed to enhance prompt.");
+  } finally {
+    setLoading(false);
   }
+}
 
   return {
     // Prompt
@@ -140,11 +180,20 @@ function clearImages() {
     deleteImage,
     clearImages,
     toggleFavorite,
+    enhanceCurrentPrompt,
 
 selectedImage,
 viewerOpen,
 
 openViewer,
 closeViewer,
+
+surpriseMe,
+
+useTemplate,
+
+historyOpen,
+openHistory,
+closeHistory,
   };
 }
