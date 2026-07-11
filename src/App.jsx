@@ -3,7 +3,8 @@ import Chat from "./pages/AIChat";
 import VideoGenerator from "./pages/VideoGenerator";
 import CodeGenerator from "./pages/CodeGenerator";
 import VoiceGenerator from "./pages/VoiceGenerator";
-import PdfAnalyzer from "./pages/PdfAnalyzer";
+
+import AIPDF from "./pages/AIPDF";
 import AITools from "./pages/AITools";
 
 import MainLayout from "./layouts/MainLayout";
@@ -21,7 +22,7 @@ function App() {
 <Route path="/video" element={<VideoGenerator />} />
 <Route path="/code" element={<CodeGenerator />} />
 <Route path="/voice" element={<VoiceGenerator />} />
-<Route path="/pdf" element={<PdfAnalyzer />} />
+<Route path="/pdf" element={<AIPDF />} />
 <Route path="/tools" element={<AITools />} />
         </Route>
       </Routes>
