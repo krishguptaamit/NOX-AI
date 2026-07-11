@@ -5,6 +5,7 @@ import useImage from "../hooks/useImage";
 import ImageViewer from "../components/image/ImageViewer";
 import { useRef } from "react";
 import HistoryModal from "../components/image/HistoryModal";
+import AIActionResultModal from "../components/pdf/AIActionResultModal";
 
 export default function AIImage() {
 
@@ -107,6 +108,13 @@ onEnhance={image.enhanceCurrentPrompt}
     image.closeHistory();
     image.openViewer(img);
   }}
+/>
+
+<AIActionResultModal
+  open={Boolean(pdf.actionResult)}
+  type={pdf.actionType}
+  result={pdf.actionResult}
+  onClose={pdf.closeActionResult}
 />
     </>
   );

@@ -1,6 +1,5 @@
 import * as pdfjsLib from "pdfjs-dist";
 
-// Vite
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
   import.meta.url
@@ -13,22 +12,34 @@ export async function parsePDF(file) {
     data: arrayBuffer,
   }).promise;
 
-  let text = "";
+  let fullText = [];
 
-  for (let i = 1; i <= pdf.numPages; i++) {
-    const page = await pdf.getPage(i);
+  const pageTexts = [];
 
-    const content =
-      await page.getTextContent();
+  for (
+    let pageNumber = 1;
+    pageNumber <= pdf.numPages;
+    pageNumber++
+  ) {
+    const page = await pdf.getPage(pageNumber);
 
-    text +=
-      content.items
-        .map((item) => item.str)
-        .join(" ") + "\n\n";
+    const content = await page.getTextContent();
+
+    const pageText = content.items
+      .map((item) => item.str)
+      .join(" ");
+
+    pageTexts.push({
+      page: pageNumber,
+      text: pageText,
+    });
+
+    fullText.push(pageText);
   }
 
   return {
     pages: pdf.numPages,
-    text,
+    text: fullText.join("\n\n"),
+    pageTexts,
   };
 }

@@ -172,7 +172,10 @@ export default function UploadPanel({ pdf }) {
             pages={pdf.pages}
           />
 
-          <PDFPreview file={pdf.file} />
+         <PDFPreview
+  file={pdf.file}
+  pageTexts={pdf.pageTexts}
+/>
         </>
       )}
 

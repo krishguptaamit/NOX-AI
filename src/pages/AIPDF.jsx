@@ -5,6 +5,7 @@ import usePDF from "../hooks/usePDF";
 import PDFHistoryModal from "../components/pdf/PDFHistoryModal";
 import ConfirmModal from "../components/pdf/ConfirmModal";
 
+
 export default function AIPDF() {
   const pdf = usePDF();
 
@@ -59,13 +60,17 @@ export default function AIPDF() {
             xl:grid-cols-[420px_minmax(0,1fr)]
           "
         >
-          {/* Left */}
+       {/* Left */}
 
-          <div className="min-w-0 xl:min-h-0 xl:overflow-y-auto">
+<div className="min-w-0 xl:min-h-0 xl:overflow-y-auto">
 
-            <UploadPanel pdf={pdf} />
+  <div className="flex flex-col gap-4 lg:gap-6">
 
-          </div>
+    <UploadPanel pdf={pdf} />
+
+  </div>
+
+</div>
 
           {/* Right */}
 

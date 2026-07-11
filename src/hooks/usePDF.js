@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { jsPDF } from "jspdf";
 import { parsePDF } from "../utils/pdfParser";
-
 import {
   summarizePDF,
   askPDFQuestionStream,
 } from "../services/pdfService";
+
 
 export default function usePDF() {
   const [file, setFile] = useState(null);
@@ -15,6 +15,8 @@ export default function usePDF() {
   const [pdfText, setPdfText] = useState("");
 
   const [summary, setSummary] = useState("");
+
+  const [pageTexts, setPageTexts] = useState([]);
 
   const [loadingPDF, setLoadingPDF] =
     useState(false);
@@ -77,6 +79,8 @@ useEffect(() => {
 
       setPdfText(result.text);
 
+      setPageTexts(result.pageTexts);
+
       const historyItem = {
   id: crypto.randomUUID(),
   name: selectedFile.name,
@@ -131,6 +135,7 @@ setPdfHistory((prev) => [
       setLoadingPDF(false);
     }
   }
+
 
   async function sendQuestion(question) {
     if (!question.trim()) return;
@@ -524,6 +529,9 @@ function confirmClearHistory() {
 
 
   function removePDF() {
+
+    setPageTexts([]);
+
     setFile(null);
 
     setPages(0);
@@ -548,6 +556,8 @@ function confirmClearHistory() {
 
     pdfText,
 
+    pageTexts,
+
     summary,
 
     loadingPDF,
@@ -563,6 +573,7 @@ function confirmClearHistory() {
     sendQuestion,
 
     removePDF,
+  
 
 regenerateAnswer,
 clearChatOpen,
@@ -585,5 +596,6 @@ confirmClearHistory,
 
 exportChatTXT,
 exportChatPDF,
+
   };
 }
